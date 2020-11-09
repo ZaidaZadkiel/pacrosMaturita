@@ -21,7 +21,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.tap.Tap;
+import com.mygdx.tap.Utility.HighScore;
 import com.mygdx.tap.Utility.MusicPlayer;
+import com.mygdx.tap.Utility.TimePlayed;
 
 
 public class Options implements Screen {
@@ -33,14 +35,19 @@ public class Options implements Screen {
     private Label soundOnOffLabel;
     private MusicPlayer arcade = MusicPlayer.vratInstanci();
 
+    HighScore score = HighScore.returnInstance();
+    TimePlayed time = TimePlayed.returnInstance();
+
 
 
     @Override
     public void show() {
+      //  System.out.println("Time elapsed in seconds = " + ((System.currentTimeMillis() - Tap.startTime)) / 1000);
+
 
         stage.clear();
         Gdx.input.setInputProcessor(stage);
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Skin skin = new Skin(Gdx.files.internal("retroUI/vhs-ui.json"));
         Table root = new Table();
         root.setFillParent(true);
@@ -58,7 +65,7 @@ public class Options implements Screen {
         table.add(label).padTop(50.0f).center();
 
         root.row();
-        TextButton backBtn = new TextButton("BACK",skin);
+        TextButton backBtn = new TextButton("BACK", skin);
         root.add(backBtn).padTop(35f);
 
         backBtn.addListener(new ChangeListener() {
@@ -69,54 +76,70 @@ public class Options implements Screen {
             }
         });
 
-        volumeMusicLabel = new Label( null, skin );
-        musicOnOffLabel = new Label( null, skin );
-        soundOnOffLabel = new Label( null, skin );
+        volumeMusicLabel = new Label(null, skin);
+        musicOnOffLabel = new Label(null, skin);
+        soundOnOffLabel = new Label(null, skin);
 
-       final CheckBox musicCheckBox = new CheckBox("MUSIC", skin);
-       root.row();
-       musicCheckBox.setChecked(parent.getPreferences().musicOn());
-       musicCheckBox.addListener(new EventListener() {
-           @Override
-           public boolean handle(Event event) {
-               boolean on = musicCheckBox.isChecked();
-               parent.getPreferences().setMusicOn(on);
-               return false;
-           }
-       });
-       musicCheckBox.addListener(new ChangeListener() {
-           @Override
-           public void changed(ChangeEvent event, Actor actor) {
-               if(musicCheckBox.isChecked()){
-                   arcade.muzika.play();
-                   System.out.println("played");
-               }
+        final CheckBox musicCheckBox = new CheckBox("MUSIC", skin);
+        root.row();
+        musicCheckBox.setChecked(parent.getPreferences().musicOn());
+        musicCheckBox.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                boolean on = musicCheckBox.isChecked();
+                parent.getPreferences().setMusicOn(on);
 
-               else{
-                   arcade.muzika.stop();
-                   System.out.println("stopped");
-               }
-           }
-       });
-       root.add(musicCheckBox).padTop(35f);
-       root.add(musicOnOffLabel);
-       final CheckBox soundCheckBox = new CheckBox("SOUND",skin);
-       root.row();
-       soundCheckBox.setChecked(parent.getPreferences().SoundOn());
-       soundCheckBox.addListener(new EventListener() {
+                return false;
 
-           @Override
 
-           public boolean handle(Event event) {
+            }
+        });
+        musicCheckBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (musicCheckBox.isChecked()) {
+                    arcade.muzika.play();
+                    System.out.println("played");
+                    score.addScore(10);
+                    parent.getPreferences().saveHighScore();
+                    //  parent.getPreferences().saveTime();
+                    System.out.println(score.getTotal());
 
-               boolean on = soundCheckBox.isChecked();
-               parent.getPreferences().setSoundOn(on);
-               return false;
-           }
-       });
-       root.add(soundCheckBox).padTop(35f);
-       root.add(soundOnOffLabel);
 
+                } else {
+                    arcade.muzika.stop();
+                    System.out.println("stopped");
+                }
+            }
+        });
+        root.add(musicCheckBox).padTop(35f);
+        root.add(musicOnOffLabel);
+        final CheckBox soundCheckBox = new CheckBox("SOUND", skin);
+        root.row();
+        soundCheckBox.setChecked(parent.getPreferences().SoundOn());
+        soundCheckBox.addListener(new EventListener() {
+
+            @Override
+
+            public boolean handle(Event event) {
+
+                boolean on = soundCheckBox.isChecked();
+                parent.getPreferences().setSoundOn(on);
+
+                return false;
+            }
+        });
+
+        soundCheckBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                System.out.println("hi");
+
+
+            }
+        });
+        root.add(soundCheckBox).padTop(35f);
+        root.add(soundOnOffLabel);
 
 
         root.row();
@@ -133,6 +156,7 @@ public class Options implements Screen {
             public boolean handle(Event event) {
                 parent.getPreferences().setMusicVolume(musicSlider.getValue());
                 arcade.muzika.setVolume(musicSlider.getValue());
+
                 return false;
             }
         });
@@ -140,11 +164,7 @@ public class Options implements Screen {
         table.add(musicSlider).width(300.0f).padLeft(10.0f);
 
 
-
-
     }
-
-
 
 
     public Options(Tap tap) {
@@ -158,6 +178,7 @@ public class Options implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 1f, 0f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         stage.draw();
 
     }

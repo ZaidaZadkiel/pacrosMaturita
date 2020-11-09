@@ -34,9 +34,17 @@ public class Menu implements Screen {
 
     @Override
     public void show() {
+
+
         stage.clear();
 
+
+
+
+
         Gdx.input.setInputProcessor(stage);
+
+
 
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -45,6 +53,7 @@ public class Menu implements Screen {
         Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
+
 
 
         Label label = new Label("TAP GAME ALPHA", skin, "play");
@@ -59,13 +68,24 @@ public class Menu implements Screen {
         table.add(label).padTop(50.0f).center();
 
         table.row();
-        TextButton playButton = new TextButton("PLAY", skin);
+        final TextButton playButton = new TextButton("PLAY", skin);
         table.add(playButton).padTop(35.0f);
 
         table.row();
         table.defaults().padTop(10.0f);
         TextButton optionsButton = new TextButton("GAME OPTIONS", skin);
         table.add(optionsButton);
+
+
+        table.row();
+        table.defaults().padTop(10.0f);
+        TextButton highScoreButton = new TextButton("HALL OF FAME", skin);
+        table.add(highScoreButton);
+
+        table.row();
+        table.defaults().padTop(10.0f);
+        TextButton aboutButton = new TextButton("ABOUT THE GAME", skin);
+        table.add(aboutButton);
 
         table.row();
         TextButton quitButton = new TextButton("QUIT", skin);
@@ -92,12 +112,28 @@ public class Menu implements Screen {
             }
         });
 
+
         optionsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 parent.screenChanger(Tap.OPTIONSCREEN);
 
 
+
+            }
+        });
+
+        highScoreButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.screenChanger(Tap.HALLOFFAMESCREEN);
+            }
+        });
+
+        aboutButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.screenChanger(Tap.ABOUTSCREEN);
             }
         });
 
@@ -107,6 +143,7 @@ public class Menu implements Screen {
 
     @Override
     public void render(float delta) {
+
 
         Gdx.gl.glClearColor(20f, 0f, 10f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -144,6 +181,7 @@ public class Menu implements Screen {
     public Menu(Tap tap) {
         parent = tap;
         stage = new Stage(new FitViewport(600, 700));
+
 
     }
 }

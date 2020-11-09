@@ -2,6 +2,7 @@ package com.mygdx.tap.Utility;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.mygdx.tap.Tap;
 
 
 public class OptionsConfig {
@@ -9,7 +10,19 @@ public class OptionsConfig {
     private static final String OptionMusicVolume = "volume";
     private static final String OptionSoundOn = "sound.enabled";
     private static final String OptionMusicOn = "music.enabled";
-    private Preferences prefs;
+    private static final String PROPERTY_highscore = "highscore";
+    private static final String PROPERTY_timeplayed = "time";
+    private Tap tap_app;
+
+
+    public Preferences prefs;
+
+    HighScore score = HighScore.returnInstance();
+    TimePlayed time = TimePlayed.returnInstance();
+
+    public OptionsConfig(Tap tap) {
+        tap_app = tap;
+    }
 
 
 
@@ -20,8 +33,31 @@ public class OptionsConfig {
     }
 
 
+    public int loadHighScore() {
+        int scores = prefs.getInteger(PROPERTY_highscore, 0);
+        score.setScore(scores);
+        return scores;
+    }
+
+    public void saveHighScore() {
+        prefs.putInteger(PROPERTY_highscore, score.getTotal());
+        prefs.flush();
+    }
+
+    public void saveTime() {
+        prefs.putFloat(PROPERTY_timeplayed, time.getTime());
+        prefs.flush();
+    }
+
+    public float loadTime() {
+        float times = prefs.getFloat(PROPERTY_timeplayed, 0);
+        time.setTime(times);
+        return times;
+    }
+
+
     public boolean musicOn() {
-        return  getOptions().getBoolean(OptionMusicOn, true);
+        return getOptions().getBoolean(OptionMusicOn, true);
     }
 
     public void setMusicOn(boolean musicEnabled) {
@@ -40,14 +76,13 @@ public class OptionsConfig {
     }
 
 
-
     public void setMusicVolume(float volume) {
         getOptions().putFloat(OptionMusicVolume, volume);
-         getOptions().flush();
+        getOptions().flush();
     }
 
     public float getMusicVolume() {
-        return  getOptions().getFloat(OptionMusicVolume, 0.5f);
+        return getOptions().getFloat(OptionMusicVolume, 0.5f);
     }
 
 
