@@ -16,8 +16,6 @@ import com.mygdx.tap.Tap;
 import com.mygdx.tap.Utility.HighScore;
 import com.mygdx.tap.Utility.TimePlayed;
 
-
-
 public class About implements Screen {
 
     private final Stage stage;
@@ -25,27 +23,18 @@ public class About implements Screen {
     OrthographicCamera camera;
     TimePlayed single = TimePlayed.returnInstance();
 
-
-
-
-
     public About(Tap tap) {
         parent = tap;
         stage = new Stage(new FitViewport(600, 700));
-
-
     }
-
     @Override
     public void show() {
-
-
 
 
         stage.clear();
         Gdx.input.setInputProcessor(stage);
 
-        camera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Skin skin = new Skin(Gdx.files.internal("retroUI/vhs-ui.json"));
         Table root = new Table();
         root.setFillParent(true);
@@ -63,28 +52,25 @@ public class About implements Screen {
         table.add(label).padTop(50.0f).center();
 
         root.row();
-        Label labelXD = new Label("COMPLETE SIMPLE MINI GAMES",skin);
+        Label labelXD = new Label("COMPLETE SIMPLE MINI GAMES", skin);
 
         root.row();
-        Label labelXD2 = new Label("CHALLENGE YOURSELF",skin);
+        Label labelXD2 = new Label("CHALLENGE YOURSELF", skin);
         root.add(labelXD2).padTop(50.0f).center();
         root.row();
-
-
-
 
 
         root.add(labelXD).padTop(50.0f).center();
 
         root.row();
 
-        Label highScoreLabel = new Label("GAME MADE BY PACROS",skin);
+        Label highScoreLabel = new Label("GAME MADE BY PACROS", skin);
 
         root.add(highScoreLabel).padTop(50.0f).center();
 
 
         root.row();
-        TextButton backBtn = new TextButton("BACK",skin);
+        TextButton backBtn = new TextButton("BACK", skin);
         root.add(backBtn).padTop(35f);
 
         backBtn.addListener(new ChangeListener() {
@@ -94,12 +80,6 @@ public class About implements Screen {
                 stage.clear();
             }
         });
-
-
-
-
-
-
     }
 
     @Override
@@ -107,8 +87,6 @@ public class About implements Screen {
         Gdx.gl.glClearColor(1f, 0f, 0f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
-
-
     }
 
     @Override

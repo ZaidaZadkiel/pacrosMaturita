@@ -14,11 +14,9 @@ public class HighScore {
         return singleton;
     }
 
-
-    public int addScore(int points){
-        score+=points;
+    public int addScore(int points) {
+        score += points;
         return score;
-
     }
 
     public Integer getTotal() {

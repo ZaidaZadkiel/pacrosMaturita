@@ -24,28 +24,18 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.tap.Tap;
 
-
 public class Menu implements Screen {
     private final Stage stage;
     private Tap parent;
     OrthographicCamera camera;
-
     boolean slider = false;
 
     @Override
     public void show() {
 
-
         stage.clear();
 
-
-
-
-
         Gdx.input.setInputProcessor(stage);
-
-
-
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -54,9 +44,7 @@ public class Menu implements Screen {
         root.setFillParent(true);
         stage.addActor(root);
 
-
-
-        Label label = new Label("TAP GAME ALPHA", skin, "play");
+        Label label = new Label("TAP GAME TESxT ", skin, "play");
         root.add(label).expandX().left().padLeft(30.0f).padTop(30.0f);
 
         root.row();
@@ -76,7 +64,6 @@ public class Menu implements Screen {
         TextButton optionsButton = new TextButton("GAME OPTIONS", skin);
         table.add(optionsButton);
 
-
         table.row();
         table.defaults().padTop(10.0f);
         TextButton highScoreButton = new TextButton("HALL OF FAME", skin);
@@ -91,9 +78,6 @@ public class Menu implements Screen {
         TextButton quitButton = new TextButton("QUIT", skin);
         table.add(quitButton);
 
-
-
-
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -107,8 +91,6 @@ public class Menu implements Screen {
                 System.out.println("Pls");
 
                 parent.screenChanger(Tap.GAMESCREEN);
-
-
             }
         });
 
@@ -117,9 +99,6 @@ public class Menu implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 parent.screenChanger(Tap.OPTIONSCREEN);
-
-
-
             }
         });
 
@@ -134,21 +113,18 @@ public class Menu implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 parent.screenChanger(Tap.ABOUTSCREEN);
+
             }
         });
-
-
 
     }
 
     @Override
     public void render(float delta) {
 
-
         Gdx.gl.glClearColor(20f, 0f, 10f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.draw();
-
 
     }
 

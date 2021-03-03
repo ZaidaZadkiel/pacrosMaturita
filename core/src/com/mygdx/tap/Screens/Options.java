@@ -25,7 +25,6 @@ import com.mygdx.tap.Utility.HighScore;
 import com.mygdx.tap.Utility.MusicPlayer;
 import com.mygdx.tap.Utility.TimePlayed;
 
-
 public class Options implements Screen {
     private final Stage stage;
     private Tap parent;
@@ -34,16 +33,12 @@ public class Options implements Screen {
     private Label musicOnOffLabel;
     private Label soundOnOffLabel;
     private MusicPlayer arcade = MusicPlayer.vratInstanci();
-
     HighScore score = HighScore.returnInstance();
     TimePlayed time = TimePlayed.returnInstance();
 
-
-
     @Override
     public void show() {
-      //  System.out.println("Time elapsed in seconds = " + ((System.currentTimeMillis() - Tap.startTime)) / 1000);
-
+        //  System.out.println("Time elapsed in seconds = " + ((System.currentTimeMillis() - Tap.startTime)) / 1000);
 
         stage.clear();
         Gdx.input.setInputProcessor(stage);
@@ -88,16 +83,15 @@ public class Options implements Screen {
             public boolean handle(Event event) {
                 boolean on = musicCheckBox.isChecked();
                 parent.getPreferences().setMusicOn(on);
-
                 return false;
-
-
             }
         });
         musicCheckBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (musicCheckBox.isChecked()) {
+                    arcade.muzika.setVolume(parent.optionsCfg.getMusicVolume());
+                    arcade.muzika.setLooping(true);
                     arcade.muzika.play();
                     System.out.println("played");
                     score.addScore(10);
@@ -125,7 +119,6 @@ public class Options implements Screen {
 
                 boolean on = soundCheckBox.isChecked();
                 parent.getPreferences().setSoundOn(on);
-
                 return false;
             }
         });
@@ -134,7 +127,6 @@ public class Options implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 System.out.println("hi");
-
 
             }
         });
@@ -163,14 +155,11 @@ public class Options implements Screen {
 
         table.add(musicSlider).width(300.0f).padLeft(10.0f);
 
-
     }
-
 
     public Options(Tap tap) {
         parent = tap;
         stage = new Stage(new FitViewport(600, 700));
-
 
     }
 
@@ -178,9 +167,7 @@ public class Options implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 1f, 0f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         stage.draw();
-
     }
 
     @Override

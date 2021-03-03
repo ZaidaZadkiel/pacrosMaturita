@@ -8,14 +8,9 @@ public class MusicPlayer {
     private static MusicPlayer singleton = new MusicPlayer();
 
     private MusicPlayer() {
-
     }
 
     public static MusicPlayer vratInstanci() {
         return singleton;
-    }
-
-    public void pocit() {
-
     }
 }

@@ -1,9 +1,7 @@
 package com.mygdx.tap.Utility;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.mygdx.tap.Tap;
-
 
 public class OptionsConfig {
     private static final String OptionNames = "tap";
@@ -14,7 +12,6 @@ public class OptionsConfig {
     private static final String PROPERTY_timeplayed = "time";
     private Tap tap_app;
 
-
     public Preferences prefs;
 
     HighScore score = HighScore.returnInstance();
@@ -24,14 +21,11 @@ public class OptionsConfig {
         tap_app = tap;
     }
 
-
-
     protected Preferences getOptions() {
         if (prefs == null)
             prefs = Gdx.app.getPreferences(OptionNames);
         return prefs;
     }
-
 
     public int loadHighScore() {
         int scores = prefs.getInteger(PROPERTY_highscore, 0);
@@ -55,7 +49,6 @@ public class OptionsConfig {
         return times;
     }
 
-
     public boolean musicOn() {
         return getOptions().getBoolean(OptionMusicOn, true);
     }
@@ -64,7 +57,6 @@ public class OptionsConfig {
         getOptions().putBoolean(OptionMusicOn, musicEnabled);
         getOptions().flush();
     }
-
 
     public boolean SoundOn() {
         return getOptions().getBoolean(OptionSoundOn, true);
@@ -75,7 +67,6 @@ public class OptionsConfig {
         getOptions().flush();
     }
 
-
     public void setMusicVolume(float volume) {
         getOptions().putFloat(OptionMusicVolume, volume);
         getOptions().flush();
@@ -84,6 +75,5 @@ public class OptionsConfig {
     public float getMusicVolume() {
         return getOptions().getFloat(OptionMusicVolume, 0.5f);
     }
-
 
 }
