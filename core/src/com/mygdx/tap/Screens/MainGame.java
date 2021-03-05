@@ -32,6 +32,10 @@ public class MainGame implements Screen {
     private float renderY;
     private Array<Rectangle> meteors;
     private long lastMeteor;
+    //private Sprite spriteSkeleton = new Sprite(skeleton);
+    //private Sprite spriteMeteor = new Sprite(meteorDrop);
+
+
 
 
     private void dropMeteor() {
@@ -51,9 +55,11 @@ public class MainGame implements Screen {
     public MainGame(Tap tap) {
         parent = tap;
         this.tap = tap;
+
         stage = new Stage(new FitViewport(600, 700));
         skeleton = new Texture("skeletodd.png");
         meteorDrop = new Texture("meteor.png");
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false,600,700);
         meteors = new Array<Rectangle>();
@@ -94,11 +100,14 @@ public class MainGame implements Screen {
 
         renderX -= Gdx.input.getAccelerometerX();
         if(renderX < 0) renderX = 0;
-        if(renderX > stage.getViewport().getWorldWidth()-128) renderX = stage.getViewport().getWorldWidth()- 128;
+        if(renderX > stage.getViewport().getWorldWidth()-64) renderX = stage.getViewport().getWorldWidth()- 64;
         parent.batch.begin();
-        parent.batch.draw(skeleton,renderX,10,128,128);
+        skeletonRect.x=renderX-64;
+        parent.batch.draw(skeleton,renderX,10,skeletonRect.width,skeletonRect.height);
+
         for(Rectangle meteor: meteors) {
             parent.batch.draw(meteorDrop, meteor.x, meteor.y);
+
         }
 
         parent.batch.end();
