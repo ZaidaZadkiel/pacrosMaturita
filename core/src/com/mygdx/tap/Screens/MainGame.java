@@ -39,12 +39,14 @@ public class MainGame implements Screen {
     private Array<Rectangle> meteors;
 
     private String scoreText;
-    private int score = 0;
-    private int hitpoints = 3;
+    private long score = 0;
+    private int hitpoints = 8;
     private float renderX;
     private float renderY;
-    private long lastMeteor;
+    private float lastMeteor;
     private float lastHit = 0.0f;
+    private int direction = 1;
+
     private BitmapFont bf = new BitmapFont();
     ShapeRenderer sr = new ShapeRenderer();
 
@@ -103,8 +105,6 @@ public class MainGame implements Screen {
 
         parent.batch.setProjectionMatrix(camera.combined);
 
-//        if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
-
         sr.setProjectionMatrix(camera.combined);
         sr.setColor(Color.BROWN);
         sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -121,7 +121,16 @@ public class MainGame implements Screen {
         sr.end();
 
         parent.batch.begin();
-            parent.batch.draw(skeleton,skeletonRect.x,skeletonRect.y,skeletonRect.width,skeletonRect.height);
+            parent.batch.draw(skeleton,
+                (direction==-1
+                    ? skeletonRect.x + skeletonRect.width
+                    : skeletonRect.x
+                ),
+                skeletonRect.y,
+                skeletonRect.width*direction,
+                skeletonRect.height
+            );
+
             if(lastHit > 0.0f){
                 parent.batch.draw(hitStar, hitRectangle.x, hitRectangle.y, hitRectangle.width, hitRectangle.height);
             }
@@ -129,8 +138,8 @@ public class MainGame implements Screen {
                 parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
             }
 
-            bf.draw(parent.batch, scoreText, 10,600);
-            for(int i=0; i!= hitpoints; i++) parent.batch.draw(heart, 20 + (32*i), 600);
+            bf.draw(parent.batch, scoreText, 10,690);
+            for(int i=0; i!= hitpoints; i++) parent.batch.draw(heart, 10 + (10*i) + (32*i), 640);
         parent.batch.end();
 
     }
@@ -144,15 +153,18 @@ public class MainGame implements Screen {
         if(Gdx.app.getType() == Application.ApplicationType.Android) {
             renderX -= Gdx.input.getAccelerometerX();
         } else {
-            renderX = Gdx.input.getX() ;
+            renderX = Gdx.input.getX();
         }
 
         if(renderX < 0) renderX = 0;
         if(renderX > stage.getViewport().getWorldWidth()-64) renderX = stage.getViewport().getWorldWidth()- 64;
+        if(Math.abs(skeletonRect.x - renderX) > 1.5f){ //threshold to change direction
+            direction = (skeletonRect.x > renderX) ? -1: 1;
+        }
+        skeletonRect.x=renderX;// + (skeletonRect.width);
 
-        skeletonRect.x=renderX;
-
-        if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
+        lastMeteor+=delta;
+        if(lastMeteor >= (1.0f - score/1000.0f) ) dropMeteor();
 
         for (Iterator<Rectangle> iter = meteors.iterator(); iter.hasNext(); ) {
             Rectangle meteor = iter.next();
@@ -169,7 +181,7 @@ public class MainGame implements Screen {
                 System.out.println("collision");
                 hitRectangle.set(skeletonRect);
                 lastHit = 0.4f; // one second
-                iter.remove();
+                if(meteors.size>0) iter.remove();
                 score -= 10;
                 hitpoints--;
                 parent.playSfx(Tap.oofSound);
@@ -179,18 +191,20 @@ public class MainGame implements Screen {
         score();
     }
 
+    int t = 0;
     private void dropMeteor() {
         Rectangle meteor = new Rectangle();
-        meteor.x = MathUtils.random(0, 600-64);
-        meteor.y = 480;
+        meteor.x = MathUtils.random(0, 600-64) ;
+//        meteor.x = t++;
+        meteor.y = 700;
         meteor.width = 64;
         meteor.height = 64;
         meteors.add(meteor);
-        lastMeteor = TimeUtils.nanoTime();
+        lastMeteor = 0;
     }
 
     private void score(){
-        scoreText =  String.format("Score: %4s", score);
+        scoreText =  String.format("Score: %4s %.4f", score, score/1000.0f);
     }
 
     @Override
