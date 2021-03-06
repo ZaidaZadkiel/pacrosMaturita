@@ -1,15 +1,10 @@
 package com.mygdx.tap;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.tap.Screens.About;
 import com.mygdx.tap.Screens.HallOfFame;
 import com.mygdx.tap.Screens.MainGame;
@@ -42,10 +37,28 @@ public class Tap extends Game {
     MusicPlayer arcade;
     HighScore score;
     TimePlayed time;
+    Sound oof;
+    Sound crash;
+
     boolean loader = true;
 
     public OptionsConfig getPreferences() {
         return this.optionsCfg;
+    }
+
+    final public static int oofSound = 1;
+    final public static int crashSound = 2;
+    public void playSfx(int which){
+        switch(which){
+            case oofSound:
+                oof.play();
+                break;
+            case crashSound:
+                crash.play();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -70,10 +83,11 @@ public class Tap extends Game {
         about = new About(this);
         batch = new SpriteBatch();
 
+        oof = Gdx.audio.newSound(Gdx.files.internal("oof.wav"));
+        crash = Gdx.audio.newSound(Gdx.files.internal("impact.wav"));
+        arcade.muzika = Gdx.audio.newMusic(Gdx.files.internal("arcade.ogg"));
 
         setScreen(menu);
-
-        arcade.muzika = Gdx.audio.newMusic(Gdx.files.internal("arcade.ogg"));
 
         if (optionsCfg.musicOn()) {
             arcade.muzika.setLooping(true);
@@ -94,11 +108,9 @@ public class Tap extends Game {
     public void render() {
         super.render();
         time.update(Gdx.graphics.getDeltaTime());
-        System.out.println(time.getTime());
-
-
-
+//        System.out.println(time.getTime());
     }
+
     @Override
     public void dispose() {
         super.dispose();

@@ -1,5 +1,6 @@
 package com.mygdx.tap.Screens;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -30,36 +31,22 @@ public class MainGame implements Screen {
     private Texture skeleton;
     private Texture meteorDrop;
     private Texture hitStar;
+    private Texture heart;
+    private Texture gameover;
+
     private Rectangle skeletonRect;
     private Rectangle hitRectangle;
+    private Array<Rectangle> meteors;
+
+    private String scoreText;
+    private int score = 0;
+    private int hitpoints = 3;
     private float renderX;
     private float renderY;
-    private Array<Rectangle> meteors;
     private long lastMeteor;
     private float lastHit = 0.0f;
     private BitmapFont bf = new BitmapFont();
-    private String scoreText;
-    private int score = 0;
-    //private Sprite spriteSkeleton = new Sprite(skeleton);
-    //private Sprite spriteMeteor = new Sprite(meteorDrop);
     ShapeRenderer sr = new ShapeRenderer();
-
-
-
-    private void dropMeteor() {
-        Rectangle meteor = new Rectangle();
-        meteor.x = MathUtils.random(0, 600-64);
-        meteor.y = 480;
-        meteor.width = 64;
-        meteor.height = 64;
-        meteors.add(meteor);
-        lastMeteor = TimeUtils.nanoTime();
-    }
-
-    @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-    }
 
     public MainGame(Tap tap) {
         parent = tap;
@@ -69,6 +56,8 @@ public class MainGame implements Screen {
         skeleton = new Texture("skeletodd.png");
         meteorDrop = new Texture("meteor.png");
         hitStar = new Texture("hit.png");
+        heart = new Texture("heart_pixel_art_32x32.png");
+        gameover = new Texture("deadskeleton.jpg");
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,600,700);
@@ -87,46 +76,24 @@ public class MainGame implements Screen {
 
         score();
     }
-    private void score(){
-        scoreText =  String.format("Score: %4s", score);
-    }
-
-    private void updateThings(float delta){
-        if(lastHit > 0.0f) {
-            lastHit -= delta;
-        }
-
-        if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
-
-        for (Iterator<Rectangle> iter = meteors.iterator(); iter.hasNext(); ) {
-            Rectangle meteor = iter.next();
-            meteor.y -= 200 * delta;
-
-            if(meteor.y < 0) {
-                hitRectangle.set(meteor);
-                lastHit = 0.20f; // one second
-                iter.remove();
-                score+=5;
-            }
-            if(meteor.overlaps(skeletonRect)){
-                System.out.println("collision");
-                hitRectangle.set(skeletonRect);
-                lastHit = 1.0f; // one second
-                iter.remove();
-                score -= 10;
-            }
-        }
-
-        renderX -= Gdx.input.getAccelerometerX();
-        if(renderX < 0) renderX = 0;
-        if(renderX > stage.getViewport().getWorldWidth()-64) renderX = stage.getViewport().getWorldWidth()- 64;
-
-        skeletonRect.x=renderX-64;
-        score();
-    }
 
     @Override
     public void render(float delta) {
+        if(hitpoints <= 0) {
+            endgame(delta);
+            return;
+        }
+
+        play(delta);
+    }
+
+    public void endgame(float delta) {
+        parent.batch.begin();
+            parent.batch.draw(gameover,0,0);
+        parent.batch.end();
+    }
+
+    public void play(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0.5f, 300);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.getViewport().apply();
@@ -142,7 +109,7 @@ public class MainGame implements Screen {
         sr.setColor(Color.BROWN);
         sr.begin(ShapeRenderer.ShapeType.Filled);
 
-        /**debug rects **/
+        /* debug rects */
 //            for (Rectangle meteor : meteors) {
 //                sr.rect(meteor.x, meteor.y,meteor.width, meteor.height);
 //            }
@@ -162,9 +129,68 @@ public class MainGame implements Screen {
                 parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
             }
 
-        bf.draw(parent.batch, scoreText, 10,600);
+            bf.draw(parent.batch, scoreText, 10,600);
+            for(int i=0; i!= hitpoints; i++) parent.batch.draw(heart, 20 + (32*i), 600);
         parent.batch.end();
 
+    }
+
+
+    private void updateThings(float delta){
+        if(lastHit > 0.0f) {
+            lastHit -= delta;
+        }
+
+        if(Gdx.app.getType() == Application.ApplicationType.Android) {
+            renderX -= Gdx.input.getAccelerometerX();
+        } else {
+            renderX = Gdx.input.getX() ;
+        }
+
+        if(renderX < 0) renderX = 0;
+        if(renderX > stage.getViewport().getWorldWidth()-64) renderX = stage.getViewport().getWorldWidth()- 64;
+
+        skeletonRect.x=renderX;
+
+        if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
+
+        for (Iterator<Rectangle> iter = meteors.iterator(); iter.hasNext(); ) {
+            Rectangle meteor = iter.next();
+            meteor.y -= 200 * delta;
+
+            if(meteor.y < 0) {
+                hitRectangle.set(meteor);
+                lastHit = 0.20f; // one second
+                iter.remove();
+                score+=5;
+                parent.playSfx(Tap.crashSound);
+            }
+            if(meteor.overlaps(skeletonRect)){
+                System.out.println("collision");
+                hitRectangle.set(skeletonRect);
+                lastHit = 0.4f; // one second
+                iter.remove();
+                score -= 10;
+                hitpoints--;
+                parent.playSfx(Tap.oofSound);
+            }
+        }
+
+        score();
+    }
+
+    private void dropMeteor() {
+        Rectangle meteor = new Rectangle();
+        meteor.x = MathUtils.random(0, 600-64);
+        meteor.y = 480;
+        meteor.width = 64;
+        meteor.height = 64;
+        meteors.add(meteor);
+        lastMeteor = TimeUtils.nanoTime();
+    }
+
+    private void score(){
+        scoreText =  String.format("Score: %4s", score);
     }
 
     @Override
@@ -191,6 +217,11 @@ public class MainGame implements Screen {
         stage.dispose();
         skeleton.dispose();
 
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(stage);
     }
 
 
