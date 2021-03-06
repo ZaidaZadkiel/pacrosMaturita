@@ -37,7 +37,9 @@ public class MainGame implements Screen {
     private Array<Rectangle> meteors;
     private long lastMeteor;
     private float lastHit = 0.0f;
-
+    private BitmapFont bf = new BitmapFont();
+    private String scoreText;
+    private int score = 0;
     //private Sprite spriteSkeleton = new Sprite(skeleton);
     //private Sprite spriteMeteor = new Sprite(meteorDrop);
     ShapeRenderer sr = new ShapeRenderer();
@@ -83,12 +85,15 @@ public class MainGame implements Screen {
         renderX=100;
         renderY=100;
 
+        score();
+    }
+    private void score(){
+        scoreText =  String.format("Score: %4s", score);
     }
 
     private void updateThings(float delta){
         if(lastHit > 0.0f) {
             lastHit -= delta;
-            Gdx.app.log("hit", String.valueOf(lastHit) );
         }
 
         if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
@@ -97,12 +102,18 @@ public class MainGame implements Screen {
             Rectangle meteor = iter.next();
             meteor.y -= 200 * delta;
 
-            if(meteor.y < 0) iter.remove();
+            if(meteor.y < 0) {
+                hitRectangle.set(meteor);
+                lastHit = 0.20f; // one second
+                iter.remove();
+                score+=5;
+            }
             if(meteor.overlaps(skeletonRect)){
                 System.out.println("collision");
                 hitRectangle.set(skeletonRect);
                 lastHit = 1.0f; // one second
                 iter.remove();
+                score -= 10;
             }
         }
 
@@ -111,6 +122,7 @@ public class MainGame implements Screen {
         if(renderX > stage.getViewport().getWorldWidth()-64) renderX = stage.getViewport().getWorldWidth()- 64;
 
         skeletonRect.x=renderX-64;
+        score();
     }
 
     @Override
@@ -127,16 +139,18 @@ public class MainGame implements Screen {
 //        if(TimeUtils.nanoTime() - lastMeteor > 1000000000) dropMeteor();
 
         sr.setProjectionMatrix(camera.combined);
-        sr.setColor(Color.RED);
-        sr.begin(ShapeRenderer.ShapeType.Line);
+        sr.setColor(Color.BROWN);
+        sr.begin(ShapeRenderer.ShapeType.Filled);
 
-            for (Rectangle meteor : meteors) {
-                sr.rect(meteor.x, meteor.y,meteor.width, meteor.height);
-            }
+        /**debug rects **/
+//            for (Rectangle meteor : meteors) {
+//                sr.rect(meteor.x, meteor.y,meteor.width, meteor.height);
+//            }
+//
+//            sr.setColor(Color.WHITE);
+//            sr.rect(skeletonRect.x, skeletonRect.y,skeletonRect.width, skeletonRect.height);
 
-            sr.setColor(Color.WHITE);
-            sr.rect(skeletonRect.x, skeletonRect.y,skeletonRect.width, skeletonRect.height);
-
+        sr.rect(0,0,600,25);
         sr.end();
 
         parent.batch.begin();
@@ -148,6 +162,7 @@ public class MainGame implements Screen {
                 parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
             }
 
+        bf.draw(parent.batch, scoreText, 10,600);
         parent.batch.end();
 
     }
