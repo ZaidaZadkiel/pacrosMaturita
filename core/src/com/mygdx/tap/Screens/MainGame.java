@@ -37,6 +37,8 @@ public class MainGame implements Screen {
     private Rectangle skeletonRect;
     private Rectangle hitRectangle;
     private Array<Rectangle> meteors;
+    private Array<Float> rotations;
+    private Array<Float> speeds;
 
     private String scoreText;
     private long score = 0;
@@ -64,6 +66,8 @@ public class MainGame implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false,600,700);
         meteors = new Array<Rectangle>();
+        rotations = new Array<Float>();
+        speeds = new Array<Float>();
         dropMeteor();
 
         skeletonRect = new Rectangle();
@@ -134,8 +138,22 @@ public class MainGame implements Screen {
             if(lastHit > 0.0f){
                 parent.batch.draw(hitStar, hitRectangle.x, hitRectangle.y, hitRectangle.width, hitRectangle.height);
             }
-            for(Rectangle meteor: meteors) {
-                parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
+            for(int i = 0; i != meteors.size; i++) {
+                Rectangle meteor = meteors.get(i);
+//            for(Rectangle meteor: meteors) {
+//                meteorSprite.draw(parent.batch);
+//                parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
+                parent.batch.draw(
+                    meteorDrop,
+                    meteor.x,
+                    meteor.y,
+                    32,32,
+                    meteor.width,
+                    meteor.height,
+                    1,1,
+                    rotations.get(i),
+                    0,0,meteorDrop.getWidth(),meteorDrop.getHeight(),false,false
+                );
             }
 
             bf.draw(parent.batch, scoreText, 10,690);
@@ -166,25 +184,31 @@ public class MainGame implements Screen {
         lastMeteor+=delta;
         if(lastMeteor >= (1.0f - score/1000.0f) ) dropMeteor();
 
-        for (Iterator<Rectangle> iter = meteors.iterator(); iter.hasNext(); ) {
-            Rectangle meteor = iter.next();
+//        for (Iterator<Rectangle> iter = meteors.iterator(); iter.hasNext(); ) {
+        for(int i = meteors.size-1; i >= 0; --i){
+            Rectangle meteor = meteors.get(i);
             meteor.y -= 200 * delta;
+            rotations.set(i, rotations.get(i)+speeds.get(i) );
 
             if(meteor.y < 0) {
                 hitRectangle.set(meteor);
                 lastHit = 0.20f; // one second
-                iter.remove();
                 score+=5;
                 parent.playSfx(Tap.crashSound);
+                meteors.removeIndex(i);
+                rotations.removeIndex(i);
+                speeds.removeIndex(i);
             }
             if(meteor.overlaps(skeletonRect)){
                 System.out.println("collision");
                 hitRectangle.set(skeletonRect);
                 lastHit = 0.4f; // one second
-                if(meteors.size>0) iter.remove();
                 score -= 10;
                 hitpoints--;
                 parent.playSfx(Tap.oofSound);
+                meteors.removeIndex(i);
+                rotations.removeIndex(i);
+                speeds.removeIndex(i);
             }
         }
 
@@ -199,7 +223,9 @@ public class MainGame implements Screen {
         meteor.y = 700;
         meteor.width = 64;
         meteor.height = 64;
+        rotations.add( 0.0f );
         meteors.add(meteor);
+        speeds.add(MathUtils.randomBoolean() ? 2.5f : -2.5f);
         lastMeteor = 0;
     }
 
