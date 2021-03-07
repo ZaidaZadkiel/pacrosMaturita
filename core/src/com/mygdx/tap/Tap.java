@@ -2,6 +2,8 @@ package com.mygdx.tap;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -87,6 +89,7 @@ public class Tap extends Game {
         crash = Gdx.audio.newSound(Gdx.files.internal("impact.wav"));
         arcade.muzika = Gdx.audio.newMusic(Gdx.files.internal("arcade.ogg"));
 
+        Gdx.input.setCatchBackKey(true);
         setScreen(menu);
 
         if (optionsCfg.musicOn()) {
@@ -108,6 +111,8 @@ public class Tap extends Game {
     public void render() {
         super.render();
         time.update(Gdx.graphics.getDeltaTime());
+        if(Gdx.input.isKeyJustPressed(Input.Keys.BACK)) setScreen(menu);
+
 //        System.out.println(time.getTime());
     }
 
@@ -145,6 +150,4 @@ public class Tap extends Game {
                 break;
         }
     }
-
-
 }
