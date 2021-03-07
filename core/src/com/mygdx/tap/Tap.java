@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.tap.Screens.About;
+import com.mygdx.tap.Screens.ChooseGame;
 import com.mygdx.tap.Screens.HallOfFame;
 import com.mygdx.tap.Screens.MainGame;
 import com.mygdx.tap.Screens.Menu;
@@ -17,6 +18,8 @@ import com.mygdx.tap.Utility.MusicPlayer;
 import com.mygdx.tap.Utility.OptionsConfig;
 import com.mygdx.tap.Utility.TimePlayed;
 
+import sun.applet.Main;
+
 public class Tap extends Game {
     public SpriteBatch batch;
 
@@ -25,10 +28,12 @@ public class Tap extends Game {
     public static final int OPTIONSCREEN = 2;
     public static final int HALLOFFAMESCREEN = 3;
     public static final int ABOUTSCREEN = 4;
+    public static final int SKELEDODGE = 5;
 
     OrthographicCamera camera;
     private Menu menu;
-    private MainGame game;
+    private ChooseGame game;
+    private MainGame skeledodge;
     private Options options;
     private HallOfFame hallOfFame;
     private About about;
@@ -78,7 +83,8 @@ public class Tap extends Game {
         score = HighScore.returnInstance();
         arcade = MusicPlayer.vratInstanci();
         menu = new Menu(this);
-        game = new MainGame(this);
+        game = new ChooseGame(this);
+        skeledodge = new MainGame(this);
         options = new Options(this);
         optionsCfg = new OptionsConfig(this);
         hallOfFame = new HallOfFame(this);
@@ -130,7 +136,7 @@ public class Tap extends Game {
                 this.setScreen(menu);
                 break;
             case GAMESCREEN:
-                if (game == null) game = new MainGame(this);
+                if (game == null) game = new ChooseGame(this);
                 this.setScreen(game);
                 break;
 
@@ -147,6 +153,11 @@ public class Tap extends Game {
             case ABOUTSCREEN:
                 if (about == null) about = new About(this);
                 this.setScreen(about);
+                break;
+
+            case SKELEDODGE:
+                if (skeledodge == null) skeledodge = new MainGame(this);
+                this.setScreen(skeledodge);
                 break;
         }
     }
