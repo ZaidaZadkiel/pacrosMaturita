@@ -3,22 +3,17 @@ package com.mygdx.tap;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.tap.Screens.About;
-import com.mygdx.tap.Screens.ChooseGame;
-import com.mygdx.tap.Screens.HallOfFame;
-import com.mygdx.tap.Screens.MainGame;
-import com.mygdx.tap.Screens.Menu;
-import com.mygdx.tap.Screens.Options;
+import com.mygdx.tap.Screens.*;
+import com.mygdx.tap.Screens.SkeledodgeGame;
 import com.mygdx.tap.Utility.HighScore;
 import com.mygdx.tap.Utility.MusicPlayer;
 import com.mygdx.tap.Utility.OptionsConfig;
 import com.mygdx.tap.Utility.TimePlayed;
 
-import sun.applet.Main;
+//import sun.applet.Main;
 
 public class Tap extends Game {
     public SpriteBatch batch;
@@ -29,11 +24,14 @@ public class Tap extends Game {
     public static final int HALLOFFAMESCREEN = 3;
     public static final int ABOUTSCREEN = 4;
     public static final int SKELEDODGE = 5;
+    public static final int FLAPPYBIRD = 6;
+    public static final int BOARDOTD = 7;
 
     OrthographicCamera camera;
     private Menu menu;
     private ChooseGame game;
-    private MainGame skeledodge;
+    private SkeledodgeGame skeledodge;
+    private BoardOfTheDeadGame boardofthedead;
     private Options options;
     private HallOfFame hallOfFame;
     private About about;
@@ -84,7 +82,7 @@ public class Tap extends Game {
         arcade = MusicPlayer.vratInstanci();
         menu = new Menu(this);
         game = new ChooseGame(this);
-        skeledodge = new MainGame(this);
+        skeledodge = new SkeledodgeGame(this);
         options = new Options(this);
         optionsCfg = new OptionsConfig(this);
         hallOfFame = new HallOfFame(this);
@@ -96,7 +94,6 @@ public class Tap extends Game {
         arcade.muzika = Gdx.audio.newMusic(Gdx.files.internal("arcade.ogg"));
 
         Gdx.input.setCatchBackKey(true);
-        setScreen(menu);
 
         if (optionsCfg.musicOn()) {
             arcade.muzika.setLooping(true);
@@ -111,6 +108,8 @@ public class Tap extends Game {
             optionsCfg.loadTime();
           optionsCfg.loadHighScore();
         }
+
+        screenChanger(BOARDOTD);
     }
 
     @Override
@@ -156,9 +155,14 @@ public class Tap extends Game {
                 break;
 
             case SKELEDODGE:
-                if (skeledodge == null) skeledodge = new MainGame(this);
+                if (skeledodge == null) skeledodge = new SkeledodgeGame(this);
                 this.setScreen(skeledodge);
                 break;
+            case BOARDOTD:
+                if (boardofthedead == null) boardofthedead = new BoardOfTheDeadGame(this);
+                this.setScreen(boardofthedead);
+                break;
+
         }
     }
 }

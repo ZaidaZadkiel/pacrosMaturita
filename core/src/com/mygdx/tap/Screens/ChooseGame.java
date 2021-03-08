@@ -2,11 +2,14 @@ package com.mygdx.tap.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton;
@@ -15,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.mygdx.tap.Tap;
@@ -28,7 +32,25 @@ public class ChooseGame implements Screen {
     OrthographicCamera camera;
     TimePlayed single = TimePlayed.returnInstance();
 
+    Skin skin = new Skin(Gdx.files.internal("retroUI/vhs-ui.json"));
 
+    TextButton skeleDodge = new TextButton("|> SKELEDODGE <|", skin);
+    TextButton flappyBird = new TextButton("|> FLAPPY JUMP <|", skin);
+    TextButton boardotd = new TextButton("|> BOARD OF THE DEAD <|", skin);
+
+    ClickListener changeColor = new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                event.getTarget().setColor(Color.GOLD);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                event.getTarget().setColor(Color.WHITE);
+                super.touchUp(event, x, y, pointer, button);
+            }
+        };
 
     public ChooseGame(Tap tap) {
         parent = tap;
@@ -42,7 +64,6 @@ public class ChooseGame implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Skin skin = new Skin(Gdx.files.internal("retroUI/vhs-ui.json"));
         Skin skin2 = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
         Table root = new Table();
         root.setFillParent(true);
@@ -61,15 +82,13 @@ public class ChooseGame implements Screen {
         table.add(label).padTop(50.0f).center();
 
         root.row();
-
-
-
-        TextButton skeleDodge = new TextButton("|> SKELEDODGE <|", skin);
         root.add(skeleDodge).padTop(35f);
+
         root.row();
-        TextButton flappyBird = new TextButton("|> FLAPPY JUMP <|", skin);
         root.add(flappyBird).padTop(35f);
 
+        root.row();
+        root.add(boardotd).padTop(35f);
 
 
 
@@ -96,6 +115,18 @@ public class ChooseGame implements Screen {
                 stage.clear();
             }
         });
+
+        boardotd.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.screenChanger(Tap.BOARDOTD);
+                stage.clear();
+            }
+        });
+
+        skeleDodge.addListener(changeColor);
+        boardotd.addListener(changeColor);
+        flappyBird.addListener(changeColor);
     }
 
     @Override

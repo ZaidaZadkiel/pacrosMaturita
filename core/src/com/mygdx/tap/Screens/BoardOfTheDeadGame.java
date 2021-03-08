@@ -1,3 +1,4 @@
+
 package com.mygdx.tap.Screens;
 
 import com.badlogic.gdx.Application;
@@ -24,12 +25,16 @@ import com.mygdx.tap.Tap;
 
 import java.util.Iterator;
 
-public class MainGame implements Screen {
+public class BoardOfTheDeadGame  implements Screen {
     private final Stage stage;
     private final Tap tap;
     private Tap parent;
     OrthographicCamera camera;
     private Texture skeleton;
+    private Texture spookyBg;
+    private Texture boardIcons;
+    private TextureRegion[][] icons;
+
     private Texture meteorDrop;
     private Texture hitStar;
     private Texture heart;
@@ -40,6 +45,8 @@ public class MainGame implements Screen {
     private Array<Rectangle> meteors;
     private Array<Float> rotations;
     private Array<Float> speeds;
+
+    private int[] squares = new int[9*9];
 
     private String scoreText;
     private long score = 0;
@@ -53,16 +60,27 @@ public class MainGame implements Screen {
     private BitmapFont bf = new BitmapFont();
     ShapeRenderer sr = new ShapeRenderer();
 
-    public MainGame(Tap tap) {
+    public BoardOfTheDeadGame(Tap tap) {
         parent = tap;
         this.tap = tap;
 
         stage = new Stage(new FitViewport(600, 700));
         skeleton = new Texture("skeletodd.png");
+        spookyBg = new Texture("boardofthedead.jpg");
+        boardIcons = new Texture("boardicons.png");
+        icons = new TextureRegion(boardIcons).split(64,64);
+
+        for(int x = 0; x!=9; x++){
+            for(int y= 0; y!= 9; y++){
+                squares[y*9+x] = 0;//MathUtils.random(0,2);
+            }
+        }
+
         meteorDrop = new Texture("meteor.png");
         hitStar = new Texture("hit.png");
         heart = new Texture("heart_pixel_art_32x32.png");
         gameover = new Texture("deadskeleton.jpg");
+
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false,600,700);
@@ -106,8 +124,8 @@ public class MainGame implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.getViewport().apply();
         camera.update();
-        updateThings(delta);
 
+//        updateThings(delta);
 
         parent.batch.setProjectionMatrix(camera.combined);
 
@@ -127,41 +145,26 @@ public class MainGame implements Screen {
         sr.end();
 
         parent.batch.begin();
-            parent.batch.draw(skeleton,
-                (direction==-1
-                    ? skeletonRect.x + skeletonRect.width
-                    : skeletonRect.x
-                ),
-                skeletonRect.y,
-                skeletonRect.width*direction,
-                skeletonRect.height
-            );
+            parent.batch.draw(spookyBg,0,0);
 
-            if(lastHit > 0.0f){
-                parent.batch.draw(hitStar, hitRectangle.x, hitRectangle.y, hitRectangle.width, hitRectangle.height);
+            for(int x = 0; x!=9; x++){
+                for(int y= 0; y!= 9; y++){
+                    parent.batch.draw(getIcon(TYPE_BOARD,squares[y*9+x]),x*64,y*64);
+                }
             }
-            for(int i = 0; i != meteors.size; i++) {
-                Rectangle meteor = meteors.get(i);
-//            for(Rectangle meteor: meteors) {
-//                meteorSprite.draw(parent.batch);
-//                parent.batch.draw(meteorDrop, meteor.x, meteor.y, meteor.width, meteor.height);
-                parent.batch.draw(
-                    meteorDrop,
-                    meteor.x,
-                    meteor.y,
-                    32,32,
-                    meteor.width,
-                    meteor.height,
-                    1,1,
-                    rotations.get(i),
-                    0,0,meteorDrop.getWidth(),meteorDrop.getHeight(),false,false
-                );
-            }
+            parent.batch.draw(skeleton,-15,10);
 
             bf.draw(parent.batch, scoreText, 10,690);
-            for(int i=0; i!= hitpoints; i++) parent.batch.draw(heart, 10 + (10*i) + (32*i), 640);
         parent.batch.end();
 
+    }
+
+    public final static int TYPE_BOARD = 0;
+    public final static int TYPE_STATUS = 1;
+    public final static int TYPE_TRAP = 2;
+
+    private TextureRegion getIcon(int type, int index){
+        return icons[type][index];
     }
 
 
@@ -227,7 +230,7 @@ public class MainGame implements Screen {
         meteor.height = 64;
         rotations.add( 0.0f );
         meteors.add(meteor);
-        speeds.add(MathUtils.randomBoolean() ? 2.5f : -2.5f);
+        speeds.add(MathUtils.random(5.0f) - 2.5f );
         lastMeteor = 0;
     }
 
